@@ -13,6 +13,7 @@ window.addEventListener('load', function () {
     text-align: center !important;
     vertical-align: middle !important;
     display: none !important;
+    user-select: none !important;
   `)
   let itv;
   let img;
@@ -20,6 +21,7 @@ window.addEventListener('load', function () {
     e.stopPropagation();
     e.preventDefault();
     console.log(img.src)
+    sendMessageToBackground('Hello from content_script!');
   });
 
   document.body.appendChild(span);
@@ -76,3 +78,15 @@ function handelBindEvent(target, type, selector, fn) {
     imgs[i].addEventListener(type, fn);
   }
 }
+
+function sendMessageToBackground(msg) {
+  chrome.runtime.sendMessage({ from: 'content_script', message: msg });
+}
+
+
+// 监听来自 background (Service Worker) 的消息
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.from === 'background') {
+    console.log('Received from background:', msg.message);
+  }
+});
