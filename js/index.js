@@ -14,6 +14,11 @@ window.addEventListener('load', function () {
     vertical-align: middle !important;
     display: none !important;
     user-select: none !important;
+    padding: 2px 7px !important;
+    background-color: red !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    font-size: 12px !important;
   `)
   let itv;
   let img;
@@ -41,23 +46,23 @@ window.addEventListener('load', function () {
           const position = getElementPosition(img)
           span.style.display = 'block';
           span.style.top = position.top + 8 + 'px';
-          span.style.left = position.left + 8 + 'px';
+          span.style.left = position.left + 80 + 'px';
 
 
           if (itv) {
             clearTimeout(itv);
           }
 
-          document.addEventListener('mousemove', function (e) {
-            if (e.x < img.x || e.x > img.x + img.width || e.y < img.y || e.y > img.y + img.height) {
+          function mousemove(e) {
+            console.log('mousemove')
+            if (e.x < position.intRect.left || e.x > position.intRect.left + position.intRect.width || e.y < position.intRect.top || e.y > position.intRect.top + position.intRect.height) {
               itv = setTimeout(() => {
                 span.style.display = 'none';
-              }, 150);
-              document.removeEventListener('mousemove', arguments.callee);
-            } else {
-
+              }, 100);
+              document.removeEventListener('mousemove', mousemove);
             }
-          });
+          }
+          document.addEventListener('mousemove', mousemove);
         });
       }
     });
@@ -81,17 +86,37 @@ function handelBindEvent(target, type, selector, fn) {
 }
 
 function getElementPosition(el) {
+  // let top = 0
+  // let left = 0
+  // let element = el
+  // while (element.offsetParent) {
+  //   top += element.offsetTop
+  //   left += element.offsetLeft
+  //   element = element.offsetParent
+  // }
+  // return { top, left }
+
+
+
   let top = 0
   let left = 0
-  let element = el
-  while (element.offsetParent) {
-    top += element.offsetTop
-    left += element.offsetLeft
-    element = element.offsetParent
-  }
-  return { top, left }
+  const rect = el.getBoundingClientRect()
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+  const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+  top = rect.top + scrollTop
+  left = rect.left + scrollLeft
+  return { top, left, rect, intRect: rectToInt(rect) }
+
 }
 
+function rectToInt(rect) {
+  return {
+    top: Math.round(rect.top),
+    left: Math.round(rect.left),
+    width: Math.round(rect.width),
+    height: Math.round(rect.height),
+  }
+}
 
 function sendMessageToBackground(msg) {
   chrome.runtime.sendMessage({ from: 'content_script', message: msg });
