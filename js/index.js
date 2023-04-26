@@ -38,9 +38,10 @@ window.addEventListener('load', function () {
           }
 
           console.dir(img)
+          const position = getElementPosition(img)
           span.style.display = 'block';
-          span.style.top = img.y + 8 + 'px';
-          span.style.left = img.x + 8 + 'px';
+          span.style.top = position.top + 8 + 'px';
+          span.style.left = position.left + 8 + 'px';
 
 
           if (itv) {
@@ -78,6 +79,19 @@ function handelBindEvent(target, type, selector, fn) {
     imgs[i].addEventListener(type, fn);
   }
 }
+
+function getElementPosition(el) {
+  let top = 0
+  let left = 0
+  let element = el
+  while (element.offsetParent) {
+    top += element.offsetTop
+    left += element.offsetLeft
+    element = element.offsetParent
+  }
+  return { top, left }
+}
+
 
 function sendMessageToBackground(msg) {
   chrome.runtime.sendMessage({ from: 'content_script', message: msg });
