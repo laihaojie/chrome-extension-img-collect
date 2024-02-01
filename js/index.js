@@ -20,8 +20,9 @@ window.addEventListener('load', function () {
     color: #fff !important;
     font-size: 12px !important;
   `)
-  let itv;
+  let itv = [];
   let img;
+  let position;
   span.addEventListener('click', function (e) {
     e.stopPropagation();
     e.preventDefault();
@@ -42,23 +43,27 @@ window.addEventListener('load', function () {
             return;
           }
 
-          console.dir(img)
-          const position = getElementPosition(img)
+          if (itv.length) {
+            itv.forEach(clearTimeout)
+          }
+
+          // console.dir(img)
+          position = getElementPosition(img)
           span.style.display = 'block';
           span.style.top = position.top + 8 + 'px';
           span.style.left = position.left + 80 + 'px';
 
-
-          if (itv) {
-            clearTimeout(itv);
-          }
-
           function mousemove(e) {
-            console.log('mousemove')
-            if (e.x < position.intRect.left || e.x > position.intRect.left + position.intRect.width || e.y < position.intRect.top || e.y > position.intRect.top + position.intRect.height) {
-              itv = setTimeout(() => {
-                span.style.display = 'none';
-              }, 100);
+            // console.log('mousemove')
+            const isOut = () => e.x < position.intRect.left || e.x > position.intRect.left + position.intRect.width || e.y < position.intRect.top || e.y > position.intRect.top + position.intRect.height;
+            if (isOut()) {
+              itv.push(setTimeout(() => {
+                if (isOut()) {
+                  span.style.display = 'none';
+                  // console.log('hide')
+                }
+
+              }, 100))
               document.removeEventListener('mousemove', mousemove);
             }
           }
@@ -70,7 +75,6 @@ window.addEventListener('load', function () {
     childList: true,
     subtree: true,
   });
-
 });
 
 
